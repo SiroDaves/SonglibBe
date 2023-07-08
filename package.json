@@ -1,7 +1,7 @@
 {
-  "name": "hayaserver",
+  "name": "songlib-backend",
   "version": "1.0.0",
-  "description": "the back end for a kenyan freelancer platform",
+  "description": "the back end for songlib",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"

@@ -1,17 +1,17 @@
 const express = require("express");
 const router = express.Router();
 
-const Acounter = require('../../models/acounter');
-const UserAddress = require('../../models/user/user_address');
+const Acounter = require('../models/acounter');
+const Edit = require('../models/edit');
 
 /**
- * GET user address list.
+ * GET edit list.
  *
- * @return user address list | empty.
+ * @return edit list | empty.
  */
 router.get('/', (req, res, next) => {
   try {
-    UserAddress.find({}).then((data) => res.json(data)).catch(next);
+    Edit.find({}).then((data) => res.json(data)).catch(next);
   } catch (error) {
     console.error(error);
     return res.status(500).send("Server error");
@@ -19,13 +19,13 @@ router.get('/', (req, res, next) => {
 });
 
 /**
- * GET single user address.
+ * GET single edit.
  *
- * @return user address details | empty.
+ * @return edit details | empty.
  */
 router.get('/:id', (req, res, next) => {
   try {
-    UserAddress.findOne({ _id: req.params.id }).then((data) => res.json(data)).catch(next);
+    Edit.findOne({ _id: req.params.id }).then((data) => res.json(data)).catch(next);
   } catch (error) {
     console.error(error);
     return res.status(500).send("Server error");
@@ -33,19 +33,19 @@ router.get('/:id', (req, res, next) => {
 });
 
 /**
- * POST new user address.
+ * POST new edit.
  *
- * @return user address details | empty.
+ * @return edit details | empty.
  */
 router.post('/', (req, res, next) => {
   if (req.body.title) {
-    Acounter.findOne({ _id: 'useraddresses' })
+    Acounter.findOne({ _id: 'edits' })
       .then((counter) => {
         req.body.id = counter.seq + 1;
 
-        UserAddress.create(req.body)
+        Edit.create(req.body)
           .then((data) => {
-            Acounter.findOneAndUpdate({ _id: 'useraddresses' }, { $inc: { seq: 1 } }, { new: true }).then();
+            Acounter.findOneAndUpdate({ _id: 'edits' }, { $inc: { seq: 1 } }, { new: true }).then();
             res.json(data);
           })
           .catch((error) => {
@@ -68,14 +68,14 @@ router.post('/', (req, res, next) => {
 });
 
 /**
- * POST edit user address.
+ * POST edit edit.
  *
- * @return user address details | empty.
+ * @return edit details | empty.
  */
 router.post('/:id', (req, res, next) => {
   let myquery = { _id: ObjectId(req.params.id) };
   if (req.body.title) {
-    UserAddress.updateOne(myquery, req.body, function (err, res) {
+    Edit.updateOne(myquery, req.body, function (err, res) {
       if (err) throw err;
       console.log("1 document updated");
       response.json(res);
@@ -86,12 +86,12 @@ router.post('/:id', (req, res, next) => {
 });
 
 /**
- * DELETE a user address.
+ * DELETE a edit.
  *
  * @return delete result | empty.
  */
 router.delete('/:id', (req, res, next) => {
-  UserAddress.findOneAndDelete({ _id: req.params.id }).then((data) => res.json(data)).catch(next);
+  Edit.findOneAndDelete({ _id: req.params.id }).then((data) => res.json(data)).catch(next);
 });
 
 module.exports = router;

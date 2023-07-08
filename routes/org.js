@@ -2,16 +2,16 @@ const express = require("express");
 const router = express.Router();
 
 const Acounter = require('../models/acounter');
-const Category = require('../models/category');
+const Org = require('../models/org');
 
 /**
- * GET category list.
+ * GET org list.
  *
- * @return category list | empty.
+ * @return org list | empty.
  */
 router.get('/', (req, res, next) => {
   try {
-    Category.find({}).then((data) => res.json(data)).catch(next);
+    Org.find({}).then((data) => res.json(data)).catch(next);
   } catch (error) {
     console.error(error);
     return res.status(500).send("Server error");
@@ -19,13 +19,13 @@ router.get('/', (req, res, next) => {
 });
 
 /**
- * GET single category.
+ * GET single org.
  *
- * @return category details | empty.
+ * @return org details | empty.
  */
 router.get('/:id', (req, res, next) => {
   try {
-    Category.findOne({ _id: req.params.id }).then((data) => res.json(data)).catch(next);
+    Org.findOne({ _id: req.params.id }).then((data) => res.json(data)).catch(next);
   } catch (error) {
     console.error(error);
     return res.status(500).send("Server error");
@@ -33,19 +33,19 @@ router.get('/:id', (req, res, next) => {
 });
 
 /**
- * POST new category.
+ * POST new org.
  *
- * @return category details | empty.
+ * @return org details | empty.
  */
 router.post('/', (req, res, next) => {
   if (req.body.title) {
-    Acounter.findOne({ _id: 'categories' })
+    Acounter.findOne({ _id: 'orgs' })
       .then((counter) => {
         req.body.id = counter.seq + 1;
 
-        Category.create(req.body)
+        Org.create(req.body)
           .then((data) => {
-            Acounter.findOneAndUpdate({ _id: 'categories' }, { $inc: { seq: 1 } }, { new: true }).then();
+            Acounter.findOneAndUpdate({ _id: 'orgs' }, { $inc: { seq: 1 } }, { new: true }).then();
             res.json(data);
           })
           .catch((error) => {
@@ -68,38 +68,30 @@ router.post('/', (req, res, next) => {
 });
 
 /**
- * POST edit category.
+ * POST org org.
  *
- * @return category details | empty.
+ * @return org details | empty.
  */
-router.put('/:id', (req, res, next) => {
-  try {
-    const update = req.body;
-    Category.findOneAndUpdate({ _id: req.params.id }, update, { new: true })
-      .then((data) => res.json({
-        status: 200,
-        data: data,
-        message: 'Category updated successfully',
-      }))
-      .catch(next);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).send("Server error");
+router.post('/:id', (req, res, next) => {
+  let myquery = { _id: ObjectId(req.params.id) };
+  if (req.body.title) {
+    Org.updateOne(myquery, req.body, function (err, res) {
+      if (err) throw err;
+      console.log("1 document updated");
+      response.json(res);
+    }).then((data) => res.json(data)).catch(next);
+  } else {
+    res.json({ error: 'An input field is either empty or invalid', });
   }
 });
 
 /**
- * DELETE a category.
+ * DELETE a org.
  *
  * @return delete result | empty.
  */
 router.delete('/:id', (req, res, next) => {
-  Category.findOneAndDelete({ _id: req.params.id })
-    .then((data) => res.json({
-      status: 200,
-      message: 'Category deleted successfully',
-    }))
-    .catch(next);
+  Org.findOneAndDelete({ _id: req.params.id }).then((data) => res.json(data)).catch(next);
 });
 
 module.exports = router;

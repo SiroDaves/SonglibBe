@@ -1,17 +1,17 @@
 const express = require("express");
 const router = express.Router();
 
-const Acounter = require('../../models/acounter');
-const UserAccount = require('../../models/user');
+const Acounter = require('../models/acounter');
+const Listed = require('../models/listed');
 
 /**
- * GET user account list.
+ * GET listed list.
  *
- * @return user account list | empty.
+ * @return listed list | empty.
  */
 router.get('/', (req, res, next) => {
   try {
-    UserAccount.find({}).then((data) => res.json(data)).catch(next);
+    Listed.find({}).then((data) => res.json(data)).catch(next);
   } catch (error) {
     console.error(error);
     return res.status(500).send("Server error");
@@ -19,13 +19,13 @@ router.get('/', (req, res, next) => {
 });
 
 /**
- * GET single user account.
+ * GET single listed.
  *
- * @return user account details | empty.
+ * @return listed details | empty.
  */
 router.get('/:id', (req, res, next) => {
   try {
-    UserAccount.findOne({ _id: req.params.id }).then((data) => res.json(data)).catch(next);
+    Listed.findOne({ _id: req.params.id }).then((data) => res.json(data)).catch(next);
   } catch (error) {
     console.error(error);
     return res.status(500).send("Server error");
@@ -33,36 +33,24 @@ router.get('/:id', (req, res, next) => {
 });
 
 /**
- * GET single user account using email
+ * POST new listed.
  *
- * @return user account details | empty.
- */
-router.get('/email/:email', (req, res, next) => {
-  try {
-    UserAccount.findOne({ email: req.params.email }).then((data) => res.json(data)).catch(next);
-  } catch (error) {
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-/**
- * POST new user account.
- *
- * @return user account details | empty.
+ * @return listed details | empty.
  */
 router.post('/', (req, res, next) => {
-  if (req.body.username) {
-    Acounter.findOne({ _id: 'useraccounts' })
+  if (req.body.title) {
+    Acounter.findOne({ _id: 'listeds' })
       .then((counter) => {
         req.body.id = counter.seq + 1;
-        UserAccount.create(req.body)
+
+        Listed.create(req.body)
           .then((data) => {
-            Acounter.findOneAndUpdate({ _id: 'useraccounts' }, { $inc: { seq: 1 } }, { new: true }).then();
+            Acounter.findOneAndUpdate({ _id: 'listeds' }, { $inc: { seq: 1 } }, { new: true }).then();
             res.json(data);
           })
           .catch((error) => {
             if (error.code === 11000) {
-              res.status(409).json({ error: `Duplicate record found: ${error.message}` });
+              res.status(409).json({ error: 'Duplicate record found' });
             } else {
               res.status(500).json({ error: 'Internal server error' });
             }
@@ -80,18 +68,18 @@ router.post('/', (req, res, next) => {
 });
 
 /**
- * POST edit user account.
+ * POST edit listed.
  *
- * @return user account details | empty.
+ * @return listed details | empty.
  */
 router.put('/:id', (req, res, next) => {
   try {
     const update = req.body;
-    UserAccount.findOneAndUpdate({ _id: req.params.id }, update, { new: true })
+    Listed.findOneAndUpdate({ _id: req.params.id }, update, { new: true })
       .then((data) => res.json({
         status: 200,
         data: data,
-        message: 'UserAccount updated successfully',
+        message: 'Listed updated successfully',
       }))
       .catch(next);
   } catch (error) {
@@ -101,15 +89,15 @@ router.put('/:id', (req, res, next) => {
 });
 
 /**
- * DELETE a user account.
+ * DELETE a listed.
  *
  * @return delete result | empty.
  */
 router.delete('/:id', (req, res, next) => {
-  UserAccount.findOneAndDelete({ _id: req.params.id })
+  Listed.findOneAndDelete({ _id: req.params.id })
     .then((data) => res.json({
       status: 200,
-      message: 'UserAccount deleted successfully',
+      message: 'Listed deleted successfully',
     }))
     .catch(next);
 });

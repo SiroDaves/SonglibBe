@@ -10,7 +10,7 @@ router.get("/", async (req, res) => {
   try {
     res.json({
       status: 200,
-      message: "Vidshop api is live!",
+      message: "Songlib api is live!",
     });
   } catch (error) {
     console.error(error);
