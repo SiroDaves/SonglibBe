@@ -25,12 +25,40 @@ router.get('/', (req, res, next) => {
  */
 router.get('/:id', (req, res, next) => {
   try {
-    Song.findOne({ _id: req.params.id }).then((data) => res.json(data)).catch(next);
+    Song.findOne({ id: req.params.id })
+      .then((song) => {
+        if (!song)
+          return res.status(404).json({ message: 'Song not found' });
+        else res.status(200).json(song);
+      })
+      .catch(next);
   } catch (error) {
     console.error(error);
-    return res.status(500).send("Server error");
+    return res.status(500).send('Server error');
   }
 });
+
+/**
+ * GET songs matching a book numbers.
+ *
+ * @return song details | empty.
+ */
+router.get('/book/:ids', (req, res, next) => {
+  try {
+    const ids = req.params.ids.split(',');
+    Song.find({ book: { $in: ids } })
+      .then((songs) => {
+        if (songs.length === 0)
+          return res.status(404).json({ message: 'No songs found for the specified books' });
+        else res.status(200).json(songs);
+      })
+      .catch(next);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send('Server error');
+  }
+});
+
 
 /**
  * POST new song.
@@ -120,7 +148,19 @@ router.post('/:id', (req, res, next) => {
  * @return delete result | empty.
  */
 router.delete('/:id', (req, res, next) => {
-  Song.findOneAndDelete({ _id: req.params.id }).then((data) => res.json(data)).catch(next);
+  try {
+    Song.findOneAndDelete({ id: req.params.id })
+      .then((song) => {
+        if (!song) {
+          return res.status(404).json({ message: 'Song not found' });
+        }
+        res.json(song);
+      })
+      .catch(next);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send('Server error');
+  }
 });
 
 module.exports = router;

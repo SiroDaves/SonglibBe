@@ -25,10 +25,16 @@ router.get('/', (req, res, next) => {
  */
 router.get('/:id', (req, res, next) => {
   try {
-    Edit.findOne({ _id: req.params.id }).then((data) => res.json(data)).catch(next);
+    Edit.findOne({ id: req.params.id })
+      .then((edit) => {
+        if (!edit)
+          return res.status(404).json({ message: 'Edit not found' });
+        else res.status(200).json(edit);
+      })
+      .catch(next);
   } catch (error) {
     console.error(error);
-    return res.status(500).send("Server error");
+    return res.status(500).send('Server error');
   }
 });
 
@@ -91,7 +97,19 @@ router.post('/:id', (req, res, next) => {
  * @return delete result | empty.
  */
 router.delete('/:id', (req, res, next) => {
-  Edit.findOneAndDelete({ _id: req.params.id }).then((data) => res.json(data)).catch(next);
+  try {
+    Edit.findOne({ id: req.params.id })
+      .then((edit) => {
+        if (!edit)
+          return res.status(404).json({ message: 'Edit not found' });
+        else
+          return res.status(200).json({ message: 'Edit deleted successfully' });
+      })
+      .catch(next);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send('Server error');
+  }
 });
 
 module.exports = router;

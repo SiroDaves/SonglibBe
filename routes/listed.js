@@ -25,10 +25,16 @@ router.get('/', (req, res, next) => {
  */
 router.get('/:id', (req, res, next) => {
   try {
-    Listed.findOne({ _id: req.params.id }).then((data) => res.json(data)).catch(next);
+    Listed.findOne({ id: req.params.id })
+      .then((listed) => {
+        if (!listed)
+          return res.status(404).json({ message: 'List not found' });
+        else res.status(200).json(listed);
+      })
+      .catch(next);
   } catch (error) {
     console.error(error);
-    return res.status(500).send("Server error");
+    return res.status(500).send('Server error');
   }
 });
 
@@ -94,12 +100,19 @@ router.put('/:id', (req, res, next) => {
  * @return delete result | empty.
  */
 router.delete('/:id', (req, res, next) => {
-  Listed.findOneAndDelete({ _id: req.params.id })
-    .then((data) => res.json({
-      status: 200,
-      message: 'Listed deleted successfully',
-    }))
-    .catch(next);
+  try {
+    Listed.findOne({ id: req.params.id })
+      .then((listed) => {
+        if (!listed)
+          return res.status(404).json({ message: 'List not found' });
+        else
+          return res.status(200).json({ message: 'List deleted successfully' });
+      })
+      .catch(next);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send('Server error');
+  }
 });
 
 module.exports = router;

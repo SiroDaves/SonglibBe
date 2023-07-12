@@ -25,10 +25,16 @@ router.get('/', (req, res, next) => {
  */
 router.get('/:id', (req, res, next) => {
   try {
-    Draft.findOne({ _id: req.params.id }).then((data) => res.json(data)).catch(next);
+    Draft.findOne({ id: req.params.id })
+      .then((draft) => {
+        if (!draft)
+          return res.status(404).json({ message: 'Draft not found' });
+        else res.status(200).json(draft);
+      })
+      .catch(next);
   } catch (error) {
     console.error(error);
-    return res.status(500).send("Server error");
+    return res.status(500).send('Server error');
   }
 });
 
@@ -91,7 +97,19 @@ router.post('/:id', (req, res, next) => {
  * @return delete result | empty.
  */
 router.delete('/:id', (req, res, next) => {
-  Draft.findOneAndDelete({ _id: req.params.id }).then((data) => res.json(data)).catch(next);
+  try {
+    Draft.findOne({ id: req.params.id })
+      .then((draft) => {
+        if (!draft)
+          return res.status(404).json({ message: 'Draft not found' });
+        else
+          return res.status(200).json({ message: 'Draft deleted successfully' });
+      })
+      .catch(next);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send('Server error');
+  }
 });
 
 module.exports = router;

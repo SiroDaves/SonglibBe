@@ -11,29 +11,7 @@ const User = require('../models/user');
  */
 router.get('/', (req, res, next) => {
   try {
-    Acounter.findOne({ _id: 'users' })
-      .then((counter) => {
-        req.body.id = counter.seq + 1;
-
-        User.create(req.body)
-          .then((data) => {
-            Acounter.findOneAndUpdate({ _id: 'users' }, { $inc: { seq: 1 } }, { new: true }).then();
-            res.json(data);
-          })
-          .catch((error) => {
-            if (error.code === 11000) {
-              res.status(409).json({ error: 'Duplicate record found' });
-            } else {
-              res.status(500).json({ error: 'Internal server error' });
-            }
-            next(error);
-          });
-      })
-      .catch((error) => {
-        console.error(error);
-        res.status(500).json({ error: 'Internal server error' });
-        next(error);
-      });
+    User.find({}).then((data) => res.json(data)).catch(next);
   } catch (error) {
     console.error(error);
     return res.status(500).send("Server error");
@@ -47,10 +25,16 @@ router.get('/', (req, res, next) => {
  */
 router.get('/:id', (req, res, next) => {
   try {
-    User.findOne({ _id: req.params.id }).then((data) => res.json(data)).catch(next);
+    User.findOne({ id: req.params.id })
+      .then((user) => {
+        if (!user)
+          return res.status(404).json({ message: 'User not found' });
+        else res.status(200).json(user);
+      })
+      .catch(next);
   } catch (error) {
     console.error(error);
-    return res.status(500).send("Server error");
+    return res.status(500).send('Server error');
   }
 });
 
@@ -114,7 +98,22 @@ router.post('/:id', (req, res, next) => {
  * @return delete result | empty.
  */
 router.delete('/:id', (req, res, next) => {
-  User.findOneAndDelete({ _id: req.params.id }).then((data) => res.json(data)).catch(next);
+  try {
+    User.findOneAndDelete({ id: req.params.id })
+      .then((user) => {
+        if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+        }
+        res.json({
+          status: 200,
+          message: 'User deleted successfully',
+        });
+      })
+      .catch(next);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send('Server error');
+  }
 });
 
 module.exports = router;

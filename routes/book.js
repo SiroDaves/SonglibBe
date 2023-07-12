@@ -25,10 +25,16 @@ router.get('/', (req, res, next) => {
  */
 router.get('/:id', (req, res, next) => {
   try {
-    Book.findOne({ _id: req.params.id }).then((data) => res.json(data)).catch(next);
+    Book.findOne({ id: req.params.id })
+      .then((book) => {
+        if (!book)
+          return res.status(404).json({ message: 'Book not found' });
+        else res.status(200).json(book);
+      })
+      .catch(next);
   } catch (error) {
     console.error(error);
-    return res.status(500).send("Server error");
+    return res.status(500).send('Server error');
   }
 });
 
@@ -64,7 +70,7 @@ router.post('/', (req, res, next) => {
       res.status(500).json({ error: 'Internal server error' });
       next(error);
     });
-    
+
   } else {
     if (req.body.title) {
       Acounter.findOne({ _id: 'books' })
@@ -123,12 +129,19 @@ router.put('/:id', (req, res, next) => {
  * @return delete result | empty.
  */
 router.delete('/:id', (req, res, next) => {
-  Book.findOneAndDelete({ _id: req.params.id })
-    .then((data) => res.json({
-      status: 200,
-      message: 'Book deleted successfully',
-    }))
-    .catch(next);
+  try {
+    Book.findOne({ id: req.params.id })
+      .then((book) => {
+        if (!book)
+          return res.status(404).json({ message: 'Book not found' });
+        else
+          return res.status(200).json({ message: 'Book deleted successfully' });
+      })
+      .catch(next);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send('Server error');
+  }
 });
 
 module.exports = router;

@@ -25,10 +25,16 @@ router.get('/', (req, res, next) => {
  */
 router.get('/:id', (req, res, next) => {
   try {
-    Org.findOne({ _id: req.params.id }).then((data) => res.json(data)).catch(next);
+    Org.findOne({ id: req.params.id })
+      .then((org) => {
+        if (!org)
+          return res.status(404).json({ message: 'Org not found' });
+        else res.status(200).json(org);
+      })
+      .catch(next);
   } catch (error) {
     console.error(error);
-    return res.status(500).send("Server error");
+    return res.status(500).send('Server error');
   }
 });
 
@@ -91,7 +97,19 @@ router.post('/:id', (req, res, next) => {
  * @return delete result | empty.
  */
 router.delete('/:id', (req, res, next) => {
-  Org.findOneAndDelete({ _id: req.params.id }).then((data) => res.json(data)).catch(next);
+  try {
+    Org.findOne({ id: req.params.id })
+      .then((org) => {
+        if (!org)
+          return res.status(404).json({ message: 'Org not found' });
+        else
+          return res.status(200).json({ message: 'Org deleted successfully' });
+      })
+      .catch(next);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send('Server error');
+  }
 });
 
 module.exports = router;
