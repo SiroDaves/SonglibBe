@@ -23,9 +23,9 @@ router.get('/', (req, res, next) => {
  *
  * @return org details | empty.
  */
-router.get('/:id', (req, res, next) => {
+router.get('/:orgid', (req, res, next) => {
   try {
-    Org.findOne({ id: req.params.id })
+    Org.findOne({ orgid: req.params.orgid })
       .then((org) => {
         if (!org)
           return res.status(404).json({ message: 'Org not found' });
@@ -47,7 +47,7 @@ router.post('/', (req, res, next) => {
   if (req.body.title) {
     Acounter.findOne({ _id: 'orgs' })
       .then((counter) => {
-        req.body.id = counter.seq + 1;
+        req.body.orgid = counter.seq + 1;
 
         Org.create(req.body)
           .then((data) => {
@@ -78,8 +78,8 @@ router.post('/', (req, res, next) => {
  *
  * @return org details | empty.
  */
-router.post('/:id', (req, res, next) => {
-  let myquery = { _id: ObjectId(req.params.id) };
+router.post('/:orgid', (req, res, next) => {
+  let myquery = { _id: ObjectId(req.params.orgid) };
   if (req.body.title) {
     Org.updateOne(myquery, req.body, function (err, res) {
       if (err) throw err;
@@ -96,9 +96,9 @@ router.post('/:id', (req, res, next) => {
  *
  * @return delete result | empty.
  */
-router.delete('/:id', (req, res, next) => {
+router.delete('/:orgid', (req, res, next) => {
   try {
-    Org.findOne({ id: req.params.id })
+    Org.deleteOne({ orgid: req.params.orgid })
       .then((org) => {
         if (!org)
           return res.status(404).json({ message: 'Org not found' });

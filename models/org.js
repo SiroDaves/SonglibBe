@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const modelSchema = new mongoose.Schema({
-    id: { type: Number, unique: true },
+    orgid: { type: Number, unique: true },
     org: { type: Number, required: true },
     title: { type: String, required: false },
     bio: { type: String, required: false },

@@ -23,9 +23,9 @@ router.get('/', (req, res, next) => {
  *
  * @return song details | empty.
  */
-router.get('/:id', (req, res, next) => {
+router.get('/:songid', (req, res, next) => {
   try {
-    Song.findOne({ id: req.params.id })
+    Song.findOne({ songid: req.params.songid })
       .then((song) => {
         if (!song)
           return res.status(404).json({ message: 'Song not found' });
@@ -59,7 +59,6 @@ router.get('/book/:ids', (req, res, next) => {
   }
 });
 
-
 /**
  * POST new song.
  *
@@ -69,13 +68,13 @@ router.post('/', (req, res, next) => {
   if (Array.isArray(req.body)) {
     const promises = [];
 
-    req.body.forEach((item) => {
-      if (item.title) {
+    req.body.forEach((song) => {
+      if (song.title) {
         const promise = Acounter.findOne({ _id: 'songs' })
           .then((counter) => {
-            item.id = counter.seq + 1;
+            song.songid = counter.seq + 1;
 
-            return Song.create(item)
+            return Song.create(song)
               .then((data) => {
                 return Acounter.findOneAndUpdate({ _id: 'songs' }, { $inc: { seq: 1 } }, { new: true });
               });
@@ -86,7 +85,7 @@ router.post('/', (req, res, next) => {
     });
 
     Promise.all(promises).then(results => {
-      res.json('items created successfully');
+      res.json('songs created successfully');
     }).catch((error) => {
       console.error(error);
       res.status(500).json({ error: 'Internal server error' });
@@ -97,7 +96,7 @@ router.post('/', (req, res, next) => {
     if (req.body.title) {
       Acounter.findOne({ _id: 'songs' })
         .then((counter) => {
-          req.body.id = counter.seq + 1;
+          req.body.songid = counter.seq + 1;
 
           Song.create(req.body)
             .then((data) => {
@@ -129,32 +128,85 @@ router.post('/', (req, res, next) => {
  *
  * @return song details | empty.
  */
-router.post('/:id', (req, res, next) => {
-  let myquery = { _id: ObjectId(req.params.id) };
+router.put('/:songid', (req, res, next) => {
   if (req.body.title) {
-    Song.updateOne(myquery, req.body, function (err, res) {
-      if (err) throw err;
-      console.log("1 document updated");
-      response.json(res);
-    }).then((data) => res.json(data)).catch(next);
+    Song.findOneAndUpdate({ songid: req.params.songid }, req.body, { new: true })
+      .then((song) => {
+        if (song)
+          res.status(200).json(song);
+        else
+          res.status(404).json({ error: 'Song not found' });
+
+      })
+      .catch((error) => {
+        res.status(500).json({ error: 'Internal server error' });
+        next(error);
+      });
   } else {
-    res.json({ error: 'An input field is either empty or invalid', });
+    res.status(400).json({ error: 'Invalid input field(s)' });
   }
 });
 
+router.put('/bulk/:songid/:value', (req, res, next) => {
+  try {
+    const valueToAdd = parseInt(req.params.value);
+    Song.find({ book: req.params.songid })
+      .then((songs) => {
+        if (songs.length === 0) {
+          return res.status(404).json({ message: 'No songs found for the specified book' });
+        } else {
+          const promises = songs.map((song) => {
+            return Song.findOneAndUpdate(
+              { _id: song._id },
+              { $set: { songid: song.songNo + valueToAdd } },
+              { new: true }
+            );
+          });
+
+          Promise.all(promises)
+            .then((updatedSongs) => {
+              res.status(200).json('Songs updated successfully');
+            })
+            .catch((error) => {
+              res.status(500).json({ error: 'Internal server error' });
+              next(error);
+            });
+        }
+      })
+      .catch(next);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send('Server error');
+  }
+});
+
+router.put('/bulkx/:songid', (req, res, next) => {
+  Song.findOneAndUpdate({ songid: req.params.songid }, req.body, { new: true })
+    .then((song) => {
+      if (song)
+        res.status(200).json(song);
+      else
+        res.status(404).json({ error: 'Song not found' });
+
+    })
+    .catch((error) => {
+      res.status(500).json({ error: 'Internal server error' });
+      next(error);
+    });
+});
 /**
  * DELETE a song.
  *
  * @return delete result | empty.
  */
-router.delete('/:id', (req, res, next) => {
+router.delete('/:songid', (req, res, next) => {
   try {
-    Song.findOneAndDelete({ id: req.params.id })
+    Song.deleteOne({ songid: req.params.songid })
       .then((song) => {
-        if (!song) {
+        if (!song)
           return res.status(404).json({ message: 'Song not found' });
-        }
-        res.json(song);
+        else
+          return res.status(200).json({ message: 'Song deleted successfully' });
       })
       .catch(next);
   } catch (error) {

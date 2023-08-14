@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const modelSchema = new mongoose.Schema({
-    id: { type: Number, unique: true },
+    listedid: { type: Number, unique: true },
     song: { type: Number, required: true },
     title: { type: String, required: false },
     description: { type: String, required: false },

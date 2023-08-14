@@ -23,13 +23,13 @@ router.get('/', (req, res, next) => {
  *
  * @return user details | empty.
  */
-router.get('/:id', (req, res, next) => {
+router.get('/:userid', (req, res, next) => {
   try {
-    User.findOne({ id: req.params.id })
+    User.deleteOne({ userid: req.params.userid })
       .then((user) => {
         if (!user)
           return res.status(404).json({ message: 'User not found' });
-        else res.status(200).json(user);
+        else res.status(200).json({ message: 'User deleted successfully' });
       })
       .catch(next);
   } catch (error) {
@@ -47,7 +47,7 @@ router.post('/', (req, res, next) => {
   if (req.body.username) {
     Acounter.findOne({ _id: 'users' })
       .then((counter) => {
-        req.body.id = counter.seq + 1;
+        req.body.userid = counter.seq + 1;
 
         User.create(req.body)
           .then((data) => {
@@ -79,8 +79,8 @@ router.post('/', (req, res, next) => {
  *
  * @return user details | empty.
  */
-router.post('/:id', (req, res, next) => {
-  let myquery = { _id: ObjectId(req.params.id) };
+router.post('/:userid', (req, res, next) => {
+  let myquery = { _id: ObjectId(req.params.userid) };
   if (req.body.title) {
     User.updateOne(myquery, req.body, function (err, res) {
       if (err) throw err;
@@ -97,9 +97,9 @@ router.post('/:id', (req, res, next) => {
  *
  * @return delete result | empty.
  */
-router.delete('/:id', (req, res, next) => {
+router.delete('/:userid', (req, res, next) => {
   try {
-    User.findOneAndDelete({ id: req.params.id })
+    User.findOneAndDelete({ userid: req.params.userid })
       .then((user) => {
         if (!user) {
           return res.status(404).json({ message: 'User not found' });

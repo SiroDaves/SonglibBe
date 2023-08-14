@@ -23,9 +23,9 @@ router.get('/', (req, res, next) => {
  *
  * @return book details | empty.
  */
-router.get('/:id', (req, res, next) => {
+router.get('/:bookid', (req, res, next) => {
   try {
-    Book.findOne({ id: req.params.id })
+    Book.findOne({ bookid: req.params.bookid })
       .then((book) => {
         if (!book)
           return res.status(404).json({ message: 'Book not found' });
@@ -51,7 +51,7 @@ router.post('/', (req, res, next) => {
       if (item.title) {
         const promise = Acounter.findOne({ _id: 'books' })
           .then((counter) => {
-            item.id = counter.seq + 1;
+            item.bookid = counter.seq + 1;
 
             return Book.create(item)
               .then((data) => {
@@ -75,7 +75,7 @@ router.post('/', (req, res, next) => {
     if (req.body.title) {
       Acounter.findOne({ _id: 'books' })
         .then((counter) => {
-          req.body.id = counter.seq + 1;
+          req.body.bookid = counter.seq + 1;
 
           Book.create(req.body)
             .then((data) => {
@@ -107,19 +107,22 @@ router.post('/', (req, res, next) => {
  *
  * @return book details | empty.
  */
-router.put('/:id', (req, res, next) => {
-  try {
-    const update = req.body;
-    Book.findOneAndUpdate({ _id: req.params.id }, update, { new: true })
-      .then((data) => res.json({
-        status: 200,
-        data: data,
-        message: 'Book updated successfully',
-      }))
-      .catch(next);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).send("Server error");
+router.put('/:bookid', (req, res, next) => {
+  if (req.body.title) {
+    Book.findOneAndUpdate({ bookid: req.params.bookid }, req.body, { new: true })
+      .then((book) => {
+        if (book)
+          res.status(200).json(book);
+        else
+          res.status(404).json({ error: 'Book not found' });
+
+      })
+      .catch((error) => {
+        res.status(500).json({ error: 'Internal server error' });
+        next(error);
+      });
+  } else {
+    res.status(400).json({ error: 'Invalid input field(s)' });
   }
 });
 
@@ -128,9 +131,9 @@ router.put('/:id', (req, res, next) => {
  *
  * @return delete result | empty.
  */
-router.delete('/:id', (req, res, next) => {
+router.delete('/:bookid', (req, res, next) => {
   try {
-    Book.findOne({ id: req.params.id })
+    Book.deleteOne({ bookid: req.params.bookid })
       .then((book) => {
         if (!book)
           return res.status(404).json({ message: 'Book not found' });

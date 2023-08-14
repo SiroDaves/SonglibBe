@@ -23,9 +23,9 @@ router.get('/', (req, res, next) => {
  *
  * @return draft details | empty.
  */
-router.get('/:id', (req, res, next) => {
+router.get('/:draftid', (req, res, next) => {
   try {
-    Draft.findOne({ id: req.params.id })
+    Draft.findOne({ draftid: req.params.draftid })
       .then((draft) => {
         if (!draft)
           return res.status(404).json({ message: 'Draft not found' });
@@ -47,7 +47,7 @@ router.post('/', (req, res, next) => {
   if (req.body.title) {
     Acounter.findOne({ _id: 'drafts' })
       .then((counter) => {
-        req.body.id = counter.seq + 1;
+        req.body.draftid = counter.seq + 1;
 
         Draft.create(req.body)
           .then((data) => {
@@ -78,8 +78,8 @@ router.post('/', (req, res, next) => {
  *
  * @return draft details | empty.
  */
-router.post('/:id', (req, res, next) => {
-  let myquery = { _id: ObjectId(req.params.id) };
+router.post('/:draftid', (req, res, next) => {
+  let myquery = { _id: ObjectId(req.params.draftid) };
   if (req.body.title) {
     Draft.updateOne(myquery, req.body, function (err, res) {
       if (err) throw err;
@@ -96,9 +96,9 @@ router.post('/:id', (req, res, next) => {
  *
  * @return delete result | empty.
  */
-router.delete('/:id', (req, res, next) => {
+router.delete('/:draftid', (req, res, next) => {
   try {
-    Draft.findOne({ id: req.params.id })
+    Draft.deleteOne({ draftid: req.params.draftid })
       .then((draft) => {
         if (!draft)
           return res.status(404).json({ message: 'Draft not found' });

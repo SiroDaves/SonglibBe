@@ -23,9 +23,9 @@ router.get('/', (req, res, next) => {
  *
  * @return listed details | empty.
  */
-router.get('/:id', (req, res, next) => {
+router.get('/:listedid', (req, res, next) => {
   try {
-    Listed.findOne({ id: req.params.id })
+    Listed.findOne({ listedid: req.params.listedid })
       .then((listed) => {
         if (!listed)
           return res.status(404).json({ message: 'List not found' });
@@ -47,7 +47,7 @@ router.post('/', (req, res, next) => {
   if (req.body.title) {
     Acounter.findOne({ _id: 'listeds' })
       .then((counter) => {
-        req.body.id = counter.seq + 1;
+        req.body.listedid = counter.seq + 1;
 
         Listed.create(req.body)
           .then((data) => {
@@ -78,10 +78,10 @@ router.post('/', (req, res, next) => {
  *
  * @return listed details | empty.
  */
-router.put('/:id', (req, res, next) => {
+router.put('/:listedid', (req, res, next) => {
   try {
     const update = req.body;
-    Listed.findOneAndUpdate({ _id: req.params.id }, update, { new: true })
+    Listed.findOneAndUpdate({ _id: req.params.listedid }, update, { new: true })
       .then((data) => res.json({
         status: 200,
         data: data,
@@ -99,9 +99,9 @@ router.put('/:id', (req, res, next) => {
  *
  * @return delete result | empty.
  */
-router.delete('/:id', (req, res, next) => {
+router.delete('/:listedid', (req, res, next) => {
   try {
-    Listed.findOne({ id: req.params.id })
+    Listed.deleteOne({ listedid: req.params.listedid })
       .then((listed) => {
         if (!listed)
           return res.status(404).json({ message: 'List not found' });

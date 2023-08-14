@@ -23,9 +23,9 @@ router.get('/', (req, res, next) => {
  *
  * @return edit details | empty.
  */
-router.get('/:id', (req, res, next) => {
+router.get('/:editid', (req, res, next) => {
   try {
-    Edit.findOne({ id: req.params.id })
+    Edit.findOne({ editid: req.params.editid })
       .then((edit) => {
         if (!edit)
           return res.status(404).json({ message: 'Edit not found' });
@@ -47,7 +47,7 @@ router.post('/', (req, res, next) => {
   if (req.body.title) {
     Acounter.findOne({ _id: 'edits' })
       .then((counter) => {
-        req.body.id = counter.seq + 1;
+        req.body.editid = counter.seq + 1;
 
         Edit.create(req.body)
           .then((data) => {
@@ -78,8 +78,8 @@ router.post('/', (req, res, next) => {
  *
  * @return edit details | empty.
  */
-router.post('/:id', (req, res, next) => {
-  let myquery = { _id: ObjectId(req.params.id) };
+router.post('/:editid', (req, res, next) => {
+  let myquery = { _id: ObjectId(req.params.editid) };
   if (req.body.title) {
     Edit.updateOne(myquery, req.body, function (err, res) {
       if (err) throw err;
@@ -96,9 +96,9 @@ router.post('/:id', (req, res, next) => {
  *
  * @return delete result | empty.
  */
-router.delete('/:id', (req, res, next) => {
+router.delete('/:editid', (req, res, next) => {
   try {
-    Edit.findOne({ id: req.params.id })
+    Edit.deleteOne({ editid: req.params.editid })
       .then((edit) => {
         if (!edit)
           return res.status(404).json({ message: 'Edit not found' });
