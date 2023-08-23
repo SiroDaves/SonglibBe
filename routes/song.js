@@ -5,30 +5,15 @@ const Acounter = require('../models/acounter');
 const Song = require('../models/song');
 
 /**
- * GET song list.
- *
- * @return song list | empty.
- */
-router.get('/', (req, res, next) => {
-  try {
-    Song.find({}).then((data) => res.json(data)).catch(next);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).send("Server error");
-  }
-});
-
-/**
  * GET single song.
  *
  * @return song details | empty.
  */
-router.get('/:songid', (req, res, next) => {
+router.get('/:songId', (req, res, next) => {
   try {
-    Song.findOne({ songid: req.params.songid })
+    Song.findOne({ songId: req.params.songId })
       .then((song) => {
-        if (!song)
-          return res.status(404).json({ message: 'Song not found' });
+        if (!song) res.status(404).json({ message: 'Song not found' });
         else res.status(200).json(song);
       })
       .catch(next);
@@ -39,18 +24,34 @@ router.get('/:songid', (req, res, next) => {
 });
 
 /**
+ * GET song list.
+ *
+ * @return song list | empty.
+ */
+router.get('/', async (req, res, next) => {
+  try {
+    await Song.find({}).select('-_id').sort('songId')
+      .then((songs) => res.json({ count: songs.length, data: songs }))
+      .catch(next);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Server error");
+  }
+});
+
+/**
  * GET songs matching a book numbers.
  *
  * @return song details | empty.
  */
-router.get('/book/:ids', (req, res, next) => {
+router.get('/book/:ids', async (req, res, next) => {
   try {
     const ids = req.params.ids.split(',');
-    Song.find({ book: { $in: ids } })
+    Song.find({ book: { $in: ids } }).select('-_id').sort('songId')
       .then((songs) => {
         if (songs.length === 0)
           return res.status(404).json({ message: 'No songs found for the specified books' });
-        else res.status(200).json(songs);
+        else res.status(200).json({ count: songs.length, data: songs });
       })
       .catch(next);
   } catch (error) {
@@ -72,20 +73,19 @@ router.post('/', (req, res, next) => {
       if (song.title) {
         const promise = Acounter.findOne({ _id: 'songs' })
           .then((counter) => {
-            song.songid = counter.seq + 1;
+            song.songId = counter.seq + 1;
 
             return Song.create(song)
               .then((data) => {
                 return Acounter.findOneAndUpdate({ _id: 'songs' }, { $inc: { seq: 1 } }, { new: true });
               });
           });
-
         promises.push(promise);
       }
     });
 
-    Promise.all(promises).then(results => {
-      res.json('songs created successfully');
+    Promise.all(promises).then(songs => {
+      res.json(songs.length + ' songs uploaded successfully');
     }).catch((error) => {
       console.error(error);
       res.status(500).json({ error: 'Internal server error' });
@@ -96,7 +96,7 @@ router.post('/', (req, res, next) => {
     if (req.body.title) {
       Acounter.findOne({ _id: 'songs' })
         .then((counter) => {
-          req.body.songid = counter.seq + 1;
+          req.body.songId = counter.seq + 1;
 
           Song.create(req.body)
             .then((data) => {
@@ -124,13 +124,13 @@ router.post('/', (req, res, next) => {
 });
 
 /**
- * POST edit song.
+ * POST song.
  *
  * @return song details | empty.
  */
-router.put('/:songid', (req, res, next) => {
+router.put('/:songId', (req, res, next) => {
   if (req.body.title) {
-    Song.findOneAndUpdate({ songid: req.params.songid }, req.body, { new: true })
+    Song.findOneAndUpdate({ songId: req.params.songId }, req.body, { new: true })
       .then((song) => {
         if (song)
           res.status(200).json(song);
@@ -147,10 +147,10 @@ router.put('/:songid', (req, res, next) => {
   }
 });
 
-router.put('/bulk/:songid/:value', (req, res, next) => {
+router.put('/bulk/:songId/:value', (req, res, next) => {
   try {
     const valueToAdd = parseInt(req.params.value);
-    Song.find({ book: req.params.songid })
+    Song.find({ book: req.params.songId })
       .then((songs) => {
         if (songs.length === 0) {
           return res.status(404).json({ message: 'No songs found for the specified book' });
@@ -158,14 +158,14 @@ router.put('/bulk/:songid/:value', (req, res, next) => {
           const promises = songs.map((song) => {
             return Song.findOneAndUpdate(
               { _id: song._id },
-              { $set: { songid: song.songNo + valueToAdd } },
+              { $set: { songId: song.songNo + valueToAdd } },
               { new: true }
             );
           });
 
           Promise.all(promises)
             .then((updatedSongs) => {
-              res.status(200).json('Songs updated successfully');
+              res.status(200).json(songs.length + ' songs updated successfully');
             })
             .catch((error) => {
               res.status(500).json({ error: 'Internal server error' });
@@ -180,33 +180,52 @@ router.put('/bulk/:songid/:value', (req, res, next) => {
   }
 });
 
-router.put('/bulkx/:songid', (req, res, next) => {
-  Song.findOneAndUpdate({ songid: req.params.songid }, req.body, { new: true })
-    .then((song) => {
-      if (song)
-        res.status(200).json(song);
-      else
-        res.status(404).json({ error: 'Song not found' });
-
-    })
-    .catch((error) => {
-      res.status(500).json({ error: 'Internal server error' });
-      next(error);
-    });
-});
 /**
  * DELETE a song.
  *
  * @return delete result | empty.
  */
-router.delete('/:songid', (req, res, next) => {
+router.delete('/:songId', (req, res, next) => {
   try {
-    Song.deleteOne({ songid: req.params.songid })
+    Song.deleteOne({ songId: req.params.songId })
       .then((song) => {
         if (!song)
           return res.status(404).json({ message: 'Song not found' });
         else
           return res.status(200).json({ message: 'Song deleted successfully' });
+      })
+      .catch(next);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send('Server error');
+  }
+});
+
+/**
+ * DELETE a song.
+ *
+ * @return delete result | empty.
+ */
+router.delete('/dulk/:book', (req, res, next) => {
+  try {
+    Song.find({ book: req.params.book })
+      .then((songs) => {
+        if (songs.length === 0) {
+          return res.status(404).json({ message: 'No songs found for the specified book' });
+        } else {
+          const promises = songs.map((song) => {
+            return Song.deleteOne({ songId: song.songId });
+          });
+
+          Promise.all(promises)
+            .then((updatedSongs) => {
+              res.status(200).json(songs.length + ' songs deleted successfully');
+            })
+            .catch((error) => {
+              res.status(500).json({ error: 'Internal server error' });
+              next(error);
+            });
+        }
       })
       .catch(next);
   } catch (error) {
