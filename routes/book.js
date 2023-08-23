@@ -9,9 +9,11 @@ const Book = require('../models/book');
  *
  * @return book list | empty.
  */
-router.get('/', (req, res, next) => {
+router.get('/', async (req, res, next) => {
   try {
-    Book.find({}).then((data) => res.json(data)).catch(next);
+    //Book.find({}).then((data) => res.json(data)).catch(next);
+    const books = await Book.find({}).select('-_id').sort('bookNo');
+    res.json({ count: books.length, data: books });
   } catch (error) {
     console.error(error);
     return res.status(500).send("Server error");
