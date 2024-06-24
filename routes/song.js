@@ -5,30 +5,11 @@ const Acounter = require('../models/acounter');
 const Song = require('../models/song');
 
 /**
- * GET single song.
- *
- * @return song details | empty.
- */
-router.get('/:songId', (req, res, next) => {
-  try {
-    Song.findOne({ songId: req.params.songId })
-      .then((song) => {
-        if (!song) res.status(404).json({ message: 'Song not found' });
-        else res.status(200).json(song);
-      })
-      .catch(next);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).send('Server error');
-  }
-});
-
-/**
  * GET song list.
  *
  * @return song list | empty.
  */
-router.get('/', async (req, res, next) => {
+router.get('/', async (res, next) => {
   try {
     await Song.find({}).select('-_id').sort('songId')
       .then((songs) => res.json({ count: songs.length, data: songs }))
@@ -85,7 +66,7 @@ router.post('/', (req, res, next) => {
     });
 
     Promise.all(promises).then(songs => {
-      res.json(songs.length + ' songs uploaded successfully');
+      res.json(songs.length + ' songs saved successfully');
     }).catch((error) => {
       console.error(error);
       res.status(500).json({ error: 'Internal server error' });
@@ -124,7 +105,26 @@ router.post('/', (req, res, next) => {
 });
 
 /**
- * POST song.
+ * GET single song.
+ *
+ * @return song details | empty.
+ */
+router.get('/:songId', (req, res, next) => {
+  try {
+    Song.findOne({ songId: req.params.songId })
+      .then((song) => {
+        if (!song) res.status(404).json({ message: 'Song not found' });
+        else res.status(200).json(song);
+      })
+      .catch(next);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send('Server error');
+  }
+});
+
+/**
+ * PUT song. (Update a song)
  *
  * @return song details | empty.
  */
@@ -147,7 +147,10 @@ router.put('/:songId', (req, res, next) => {
   }
 });
 
-router.put('/bulk/:songId/:value', (req, res, next) => {
+/**
+ * PUT many songs (Update many songs)
+ */
+router.put('/bulk/:value', (req, res, next) => {
   try {
     const valueToAdd = parseInt(req.params.value);
     Song.find({ book: req.params.songId })
@@ -206,7 +209,7 @@ router.delete('/:songId', (req, res, next) => {
  *
  * @return delete result | empty.
  */
-router.delete('/dulk/:book', (req, res, next) => {
+router.delete('/bulk/:book', (req, res, next) => {
   try {
     Song.find({ book: req.params.book })
       .then((songs) => {

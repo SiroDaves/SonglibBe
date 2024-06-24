@@ -25,9 +25,9 @@ router.get('/', async (req, res, next) => {
  *
  * @return book details | empty.
  */
-router.get('/:bookid', (req, res, next) => {
+router.get('/:bookId', (req, res, next) => {
   try {
-    Book.findOne({ bookid: req.params.bookid })
+    Book.findOne({ bookId: req.params.bookId })
       .then((book) => {
         if (!book)
           return res.status(404).json({ message: 'Book not found' });
