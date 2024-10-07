@@ -3,32 +3,25 @@
     "info": {
         "title": "SongLib API",
         "description": "API documentation for Songlib",
-        "version": "1.0"
+        "version": "1.0",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "APIs Support",
+            "url": "http://www.swagger.io/support",
+            "email": "support@swagger.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
     },
     "host": "songlive.vercel.app",
     "basePath": "/api",
-    "schemes": [
-        "https"
-    ],
-    "securityDefinitions": {
-        "Bearer": {
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header",
-            "description": "Enter your Bearer token in the format 'Bearer {token}'"
-        }
-    },
-    "security": [
-        {
-            "Bearer": []
-        }
-    ],
+    "schemes": [ "https" ],
     "paths": {
         "/book": {
             "get": {
-                "tags": [
-                    "Book"
-                ],
+                "tags": [ "Book" ],
                 "summary": "Get Book List",
                 "responses": {
                     "200": {
@@ -45,9 +38,7 @@
         },
         "/book/{bookId}": {
             "get": {
-                "tags": [
-                    "Book"
-                ],
+                "tags": [ "Book" ],
                 "summary": "Get a Book by ID",
                 "parameters": [
                     {
@@ -72,9 +63,7 @@
         },
         "/song": {
             "get": {
-                "tags": [
-                    "Song"
-                ],
+                "tags": [ "Song" ],
                 "summary": "Get Song List",
                 "responses": {
                     "200": {
@@ -89,8 +78,11 @@
                 }
             },
             "post": {
-                "tags": [
-                    "Song"
+                "tags": [ "Song" ],
+                "security": [
+                    {
+                        "Bearer": []
+                    }
                 ],
                 "summary": "Save a Song",
                 "parameters": [
@@ -111,9 +103,7 @@
         },
         "/song/{songId}": {
             "get": {
-                "tags": [
-                    "Song"
-                ],
+                "tags": [ "Song" ],
                 "summary": "Get a Song by ID",
                 "parameters": [
                     {
@@ -136,8 +126,11 @@
                 }
             },
             "delete": {
-                "tags": [
-                    "Song"
+                "tags": [ "Song" ],
+                "security": [
+                    {
+                        "Bearer": []
+                    }
                 ],
                 "summary": "Delete a Song",
                 "parameters": [
@@ -157,9 +150,7 @@
         },
         "/song/{bookIds}": {
             "get": {
-                "tags": [
-                    "Song"
-                ],
+                "tags": [ "Song" ],
                 "summary": "Get Song List by Book ID(s)",
                 "parameters": [
                     {
@@ -198,8 +189,11 @@
         },
         "/song/bulk/{bookId}": {
             "delete": {
-                "tags": [
-                    "Song"
+                "tags": [ "Song" ],
+                "security": [
+                    {
+                        "Bearer": []
+                    }
                 ],
                 "summary": "Delete Songs by Book ID",
                 "parameters": [
@@ -221,8 +215,11 @@
         },
         "/song/bulk": {
             "post": {
-                "tags": [
-                    "Song"
+                "tags": [ "Song" ],
+                "security": [
+                    {
+                        "Bearer": []
+                    }
                 ],
                 "summary": "Save Multiple Songs",
                 "requestBody": {
@@ -260,9 +257,7 @@
         },
         "/song/bulk/{valueToAdd}": {
             "put": {
-                "tags": [
-                    "Song"
-                ],
+                "tags": [ "Song" ],
                 "summary": "Update Multiple Songs",
                 "parameters": [
                     {
@@ -309,9 +304,7 @@
         },
         "/draft": {
             "get": {
-                "tags": [
-                    "Draft"
-                ],
+                "tags": [ "Draft" ],
                 "summary": "Get Draft List",
                 "responses": {
                     "200": {
@@ -326,8 +319,11 @@
                 }
             },
             "post": {
-                "tags": [
-                    "Draft"
+                "tags": [ "Draft" ],
+                "security": [
+                    {
+                        "Bearer": []
+                    }
                 ],
                 "summary": "Save a Draft",
                 "parameters": [
@@ -348,9 +344,7 @@
         },
         "/draft/{draftId}": {
             "get": {
-                "tags": [
-                    "Draft"
-                ],
+                "tags": [ "Draft" ],
                 "summary": "Get a Draft by ID",
                 "parameters": [
                     {
@@ -373,8 +367,11 @@
                 }
             },
             "delete": {
-                "tags": [
-                    "Draft"
+                "tags": [ "Draft" ],
+                "security": [
+                    {
+                        "Bearer": []
+                    }
                 ],
                 "summary": "Delete a Draft",
                 "parameters": [
@@ -435,9 +432,7 @@
         },
         "/edit": {
             "get": {
-                "tags": [
-                    "Edit"
-                ],
+                "tags": [ "Edit" ],
                 "summary": "Get Edit List",
                 "responses": {
                     "200": {
@@ -452,8 +447,11 @@
                 }
             },
             "post": {
-                "tags": [
-                    "Edit"
+                "tags": [ "Edit" ],
+                "security": [
+                    {
+                        "Bearer": []
+                    }
                 ],
                 "summary": "Save a Edit",
                 "parameters": [
@@ -474,9 +472,7 @@
         },
         "/edit/{editId}": {
             "get": {
-                "tags": [
-                    "Edit"
-                ],
+                "tags": [ "Edit" ],
                 "summary": "Get a Edit by ID",
                 "parameters": [
                     {
@@ -499,8 +495,11 @@
                 }
             },
             "delete": {
-                "tags": [
-                    "Edit"
+                "tags": [ "Edit" ],
+                "security": [
+                    {
+                        "Bearer": []
+                    }
                 ],
                 "summary": "Delete a Edit",
                 "parameters": [
@@ -561,9 +560,7 @@
         },
         "/listed": {
             "get": {
-                "tags": [
-                    "Listed"
-                ],
+                "tags": [ "Listed" ],
                 "summary": "Get Listed List",
                 "responses": {
                     "200": {
@@ -578,8 +575,11 @@
                 }
             },
             "post": {
-                "tags": [
-                    "Listed"
+                "tags": [ "Listed" ],
+                "security": [
+                    {
+                        "Bearer": []
+                    }
                 ],
                 "summary": "Save a Listed",
                 "parameters": [
@@ -600,9 +600,7 @@
         },
         "/listed/{listedId}": {
             "get": {
-                "tags": [
-                    "Listed"
-                ],
+                "tags": [ "Listed" ],
                 "summary": "Get a Listed by ID",
                 "parameters": [
                     {
@@ -625,8 +623,11 @@
                 }
             },
             "delete": {
-                "tags": [
-                    "Listed"
+                "tags": [ "Listed" ],
+                "security": [
+                    {
+                        "Bearer": []
+                    }
                 ],
                 "summary": "Delete a Listed",
                 "parameters": [
@@ -645,9 +646,7 @@
             },
             "/listed/{bookIds}": {
                 "get": {
-                    "tags": [
-                        "Listed"
-                    ],
+                    "tags": [ "Listed" ],
                     "summary": "Get Listed List by Book ID(s)",
                     "parameters": [
                         {
@@ -687,9 +686,7 @@
         },
         "/org": {
             "get": {
-                "tags": [
-                    "Organisation"
-                ],
+                "tags": [ "Organisation" ],
                 "summary": "Get Organisation List",
                 "responses": {
                     "200": {
@@ -704,8 +701,11 @@
                 }
             },
             "post": {
-                "tags": [
-                    "Organisation"
+                "tags": [ "Organisation" ],
+                "security": [
+                    {
+                        "Bearer": []
+                    }
                 ],
                 "summary": "Save a Organisation",
                 "parameters": [
@@ -726,9 +726,7 @@
         },
         "/org/{orgId}": {
             "get": {
-                "tags": [
-                    "Organisation"
-                ],
+                "tags": [ "Organisation" ],
                 "summary": "Get a Organisation by ID",
                 "parameters": [
                     {
@@ -751,8 +749,11 @@
                 }
             },
             "delete": {
-                "tags": [
-                    "Organisation"
+                "tags": [ "Organisation" ],
+                "security": [
+                    {
+                        "Bearer": []
+                    }
                 ],
                 "summary": "Delete a Organisation",
                 "parameters": [
@@ -772,9 +773,7 @@
         },
         "/user": {
             "get": {
-                "tags": [
-                    "User"
-                ],
+                "tags": [ "User" ],
                 "summary": "Get User List",
                 "responses": {
                     "200": {
@@ -789,8 +788,11 @@
                 }
             },
             "post": {
-                "tags": [
-                    "User"
+                "tags": [ "User" ],
+                "security": [
+                    {
+                        "Bearer": []
+                    }
                 ],
                 "summary": "Save a User",
                 "parameters": [
@@ -811,9 +813,7 @@
         },
         "/user/{userId}": {
             "get": {
-                "tags": [
-                    "User"
-                ],
+                "tags": [ "User" ],
                 "summary": "Get a User by ID",
                 "parameters": [
                     {
@@ -836,8 +836,11 @@
                 }
             },
             "delete": {
-                "tags": [
-                    "User"
+                "tags": [ "User" ],
+                "security": [
+                    {
+                        "Bearer": []
+                    }
                 ],
                 "summary": "Delete a User",
                 "parameters": [
