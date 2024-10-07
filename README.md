@@ -1,6 +1,6 @@
 # SongLib Backend
 
-This repository contains the backend for the **SongLib** application, a platform that allows users to manage, store, and access their song collections. The backend is deployed at [songlib.vercel.app](https://songlib.vercel.app), providing API endpoints to power the SongLib frontend and handle various operations related to songs.
+This repository contains the backend for the **SongLib** application, a platform that allows users to manage, store, and access their song collections. The backend is deployed at [songlive.vercel.app](https://songlive.vercel.app), providing API endpoints to power the SongLib frontend and handle various operations related to songs.
 
 ## Project Structure
 

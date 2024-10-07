@@ -1,10 +1,15 @@
 const express = require("express");
 const mongoose = require('mongoose');
 const cors = require('cors');
+const swaggerUi = require('swagger-ui-express');
+const fs = require('fs');
+const path = require('path');
 
 if (process.env.NODE_ENV !== 'production') {
     require("dotenv").config({ path: "./.env" });
 }
+
+const swaggerDoc = JSON.parse(fs.readFileSync(path.join(__dirname, 'api', 'docs.json'), 'utf8'));
 
 const app = express();
 app.use(cors());
@@ -47,6 +52,8 @@ app.use("/api/listed", listed);
 app.use("/api/org", org);
 app.use("/api/song", song);
 app.use("/api/user", user);
+
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 
 const PORT = process.env.PORT || 4000;
 
