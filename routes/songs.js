@@ -12,7 +12,7 @@ const Song = require('../models/song');
 router.get('/', async (res, next) => {
   try {
     await Song.find({}).select('-_id').sort('songId')
-      .then((songs) => res.json({ count: songs.length, data: songs }))
+      .then((data) => res.json(data))
       .catch(next);
   } catch (error) {
     console.error(error);
@@ -25,14 +25,14 @@ router.get('/', async (res, next) => {
  *
  * @return song details | empty.
  */
-router.get('/book/:ids', async (req, res, next) => {
+router.get('/books/:ids', async (req, res, next) => {
   try {
     const ids = req.params.ids.split(',');
     Song.find({ book: { $in: ids } }).select('-_id').sort('songId')
-      .then((songs) => {
-        if (songs.length === 0)
+      .then((data) => {
+        if (data.length === 0)
           return res.status(404).json({ message: 'No songs found for the specified books' });
-        else res.status(200).json({ count: songs.length, data: songs });
+        else res.status(200).json(data);
       })
       .catch(next);
   } catch (error) {
